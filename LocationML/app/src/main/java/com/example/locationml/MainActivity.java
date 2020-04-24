@@ -20,6 +20,9 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,16 +40,16 @@ public class MainActivity extends AppCompatActivity {
     private static List<PlaceLikelihood> placeLikelihoods;
     public PlacesClient placesClient;
 
+    public String place;
+    public String likelihood;
+    private static final String urlAdrress="https://serwer1990534.home.pl/PostLocation.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         placesClient = InitPlaces();
-
         likelihoodsRunnable = CreateRunnableForLikelihood();
         RunGetPlacesTask(likelihoodsRunnable);
-
     }
 
     private Runnable CreateRunnableForLikelihood() {
@@ -85,18 +88,21 @@ public class MainActivity extends AppCompatActivity {
             placeResponse.addOnCompleteListener(task -> {
                 String TAG = "Place";
                 if (task.isSuccessful()){
-                    FindCurrentPlaceResponse response = task.getResult();
-                    for (PlaceLikelihood placeLikelihood : placeLikelihoods = response.getPlaceLikelihoods()) {
-                        if(placeLikelihood.getLikelihood() > LIKELIHOOD_LIMIT_PERCENTAGE) {
-                            Log.d(TAG, String.format("Place '%s' has likelihood: %f",
-                                    placeLikelihood.getPlace().getName(),
-                                    placeLikelihood.getLikelihood()));
-                            TextView textView = (TextView)findViewById(R.id.text);
-                            textView.setText(placeLikelihood.getPlace().getName());
-                        }
-                    }
-                    Log.d(TAG, String.format("type '%s'", response.toString()));
-                } else {
+                            FindCurrentPlaceResponse response = task.getResult();
+                            for (PlaceLikelihood placeLikelihood : placeLikelihoods = response.getPlaceLikelihoods()) {
+                                if(placeLikelihood.getLikelihood() > LIKELIHOOD_LIMIT_PERCENTAGE) {
+                                    Log.d(TAG, String.format("Place '%s' has likelihood: %f", placeLikelihood.getPlace().getName(), placeLikelihood.getLikelihood()));
+                                    place = placeLikelihood.getPlace().getName();
+                                    likelihood = Double.toString(placeLikelihood.getLikelihood());
+                                    Sender s =new Sender(MainActivity.this,urlAdrress,place,likelihood);
+                                    s.execute();
+                                    TextView textView = (TextView)findViewById(R.id.text);
+                                    textView.setText(placeLikelihood.getPlace().getName());
+                                }
+                            }
+                            Log.d(TAG, String.format("type '%s'", response.toString()));
+                }
+                    else {
                     Exception exception = task.getException();
                     if (exception instanceof ApiException) {
                         ApiException apiException = (ApiException) exception;
@@ -112,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
