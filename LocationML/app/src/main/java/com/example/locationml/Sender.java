@@ -12,20 +12,23 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.util.List;
 
 public class Sender extends AsyncTask<Void,Void,String>{
 
     Context c;
     String urlAddress;
     String place,likelihood;
+    List<String> placeTypes;
 
     ProgressDialog pd;
 
-    public Sender(Context c, String urlAddress,String place,String likelihood) {
+    public Sender(Context c, String urlAddress, String place, String likelihood, List<String> placeTypes) {
         this.c = c;
         this.urlAddress = urlAddress;
         this.place=place;
         this.likelihood=likelihood;
+        this.placeTypes=placeTypes;
     }
 
     @Override

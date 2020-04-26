@@ -15,6 +15,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.Place.Type;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
@@ -31,6 +32,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String TAG = "Place";
     private static Handler handler = new Handler();
     private Runnable likelihoodsRunnable;
     private static final String APP_KEY = "AIzaSyAIv8KvG6Sz5S87c2QTcMc_z-BYL7kX3C8";
@@ -42,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
     public String place;
     public String likelihood;
+    public List<String> placeTypes;
     private static final String urlAdrress="https://serwer1990534.home.pl/PostLocation.php";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,58 +69,65 @@ public class MainActivity extends AppCompatActivity {
     private void RunGetPlacesTask(Runnable runnable) {
         handler.post(runnable);
     }
-
-    private void StopGetPlaceTask(Runnable runnable) {
-        handler.removeCallbacks(runnable);
-
-    }
+    private void StopGetPlaceTask(Runnable runnable) { handler.removeCallbacks(runnable); }
 
     PlacesClient InitPlaces() {
         Places.initialize(getApplicationContext(), APP_KEY);
         return Places.createClient(this);
     }
 
-    void GetNearbyPlaces(float likelihoodLimit) {
-        // Use fields to define the data types to return.
+    FindCurrentPlaceRequest PreparePlacesRequest() {
         List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.TYPES);
-        // Use the builder to create a FindCurrentPlaceRequest.
-        FindCurrentPlaceRequest request =
-        FindCurrentPlaceRequest.newInstance(placeFields);
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-            placeResponse.addOnCompleteListener(task -> {
-                String TAG = "Place";
-                if (task.isSuccessful()){
-                            FindCurrentPlaceResponse response = task.getResult();
-                            for (PlaceLikelihood placeLikelihood : placeLikelihoods = response.getPlaceLikelihoods()) {
-                                if(placeLikelihood.getLikelihood() > LIKELIHOOD_LIMIT_PERCENTAGE) {
-                                    Log.d(TAG, String.format("Place '%s' has likelihood: %f", placeLikelihood.getPlace().getName(), placeLikelihood.getLikelihood()));
-                                    place = placeLikelihood.getPlace().getName();
-                                    likelihood = Double.toString(placeLikelihood.getLikelihood());
-                                    Sender s =new Sender(MainActivity.this,urlAdrress,place,likelihood);
-                                    s.execute();
-                                    TextView textView = (TextView)findViewById(R.id.text);
-                                    textView.setText(placeLikelihood.getPlace().getName());
-                                }
-                            }
-                            Log.d(TAG, String.format("type '%s'", response.toString()));
-                }
-                    else {
-                    Exception exception = task.getException();
-                    if (exception instanceof ApiException) {
-                        ApiException apiException = (ApiException) exception;
-                        Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+        return FindCurrentPlaceRequest.newInstance(placeFields);
+    }
+
+    void CreatePlacesTask(FindCurrentPlaceRequest request) {
+        Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+        placeResponse.addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                FindCurrentPlaceResponse response = task.getResult();
+                for (PlaceLikelihood placeLikelihood : placeLikelihoods = response.getPlaceLikelihoods()) {
+                    if(placeLikelihood.getLikelihood() > LIKELIHOOD_LIMIT_PERCENTAGE) {
+                        place = placeLikelihood.getPlace().getName();
+                        likelihood = Double.toString(placeLikelihood.getLikelihood());
+                        List<Type> types = placeLikelihood.getPlace().getTypes();
+                        for(Type type : types){
+                            placeTypes.add(type.name());
+                        }
+                        Sender s =new Sender(MainActivity.this,urlAdrress,place,likelihood,placeTypes);
+                        s.execute();
+                        placeTypes.clear();
                     }
                 }
-            });
+                Log.d(TAG, String.format("type '%s'", response.toString()));
+            }
+            else {
+                Exception exception = task.getException();
+                if (exception instanceof ApiException) {
+                    ApiException apiException = (ApiException) exception;
+                    Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                }
+            }
+        });
+    }
+
+    void GetNearbyPlaces(float likelihoodLimit) {
+        FindCurrentPlaceRequest request = PreparePlacesRequest();
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            CreatePlacesTask(request);
         } else {
-            Log.d("Place","Ask for permission");
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            RequestLocationPermission();
         }
     }
+
+    public void RequestLocationPermission () {
+        Log.d("Place","Ask for permission");
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
