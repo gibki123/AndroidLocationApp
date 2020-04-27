@@ -11,9 +11,10 @@ import java.util.Random;
 public class DataGenerator {
     private static double LIKELIHOOD_LIMIT_TO_STAY = 0.8;
     private static double PROBABILITY_TO_STAY_LONGER = 0.5;
-    private static double PROBABILITY_TO_STAY_MUCH_LONGER = 0.9;
+    private static double PROBABILITY_TO_STAY_MUCH_LONGER = 0.8;
     private static double startingTimestamp = 1262340000 * 1000; // Equivalent of 2010:01:01 00:00:00
     private static double fakeTimestamp = startingTimestamp;
+    private static double probabilityDecreaser = 0.2;
     private static Date fakeTimeOfGeneration;
     private static double MINUTE_IN_MILLISECONDS = 60000;
 
@@ -23,7 +24,6 @@ public class DataGenerator {
             Boolean staying = true;
             String likelihoodString = Double.toString(likelihood);
             double stayingProbability = PROBABILITY_TO_STAY_LONGER;
-            double probabilityDecreaser = 0.1;
             double i = 0.0;
             while(staying) {
                 SendData(context,placeName,likelihoodString,types,urlAddress);
@@ -39,7 +39,7 @@ public class DataGenerator {
     }
 
     private void IncrementTime() {
-        fakeTimestamp += 5 * MINUTE_IN_MILLISECONDS;
+        fakeTimestamp += 20 * MINUTE_IN_MILLISECONDS;
     }
 
     private void CreateNewDate() {
