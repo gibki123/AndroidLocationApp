@@ -18,17 +18,16 @@ public class Sender extends AsyncTask<Void,Void,String>{
 
     Context c;
     String urlAddress;
-    String place,likelihood;
-    List<String> placeTypes;
+    String place,likelihood, typeOfLocation;
 
     ProgressDialog pd;
 
-    public Sender(Context c, String urlAddress, String place, String likelihood, List<String> placeTypes) {
+    public Sender(Context c, String urlAddress, String place, String likelihood, String typeOfLocation) {
         this.c = c;
         this.urlAddress = urlAddress;
         this.place=place;
         this.likelihood=likelihood;
-        this.placeTypes=placeTypes;
+        this.typeOfLocation=typeOfLocation;
     }
 
     @Override
@@ -77,7 +76,7 @@ public class Sender extends AsyncTask<Void,Void,String>{
             OutputStream os=con.getOutputStream();
 
             BufferedWriter bw=new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
-            bw.write(new DataPackager(place,likelihood).packData());
+            bw.write(new DataPackager(place,likelihood,typeOfLocation).packData());
 
             bw.flush();
 

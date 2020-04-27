@@ -11,10 +11,12 @@ public class DataPackager {
 
     String place;
     String likelihood;
+    String typeOfLocation;
 
-    public DataPackager(String place, String likelihood) {
+    public DataPackager(String place, String likelihood,String typeOfLocation) {
         this.place = place;
         this.likelihood = likelihood;
+        this.typeOfLocation = typeOfLocation;
     }
 
     public String packData()
@@ -25,6 +27,7 @@ public class DataPackager {
         {
             jo.put("place",place);
             jo.put("likelihood",likelihood);
+            jo.put("typeOfLocation",typeOfLocation);
             Boolean firstValue=true;
             Iterator it=jo.keys();
             do {

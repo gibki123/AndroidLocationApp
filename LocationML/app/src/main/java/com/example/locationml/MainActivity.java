@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String place;
     public String likelihood;
-    public List<String> placeTypes;
+    public String typeOfLocation;
     private static final String urlAdrress="https://serwer1990534.home.pl/PostLocation.php";
 
     @Override
@@ -91,12 +91,14 @@ public class MainActivity extends AppCompatActivity {
                         place = placeLikelihood.getPlace().getName();
                         likelihood = Double.toString(placeLikelihood.getLikelihood());
                         List<Type> types = placeLikelihood.getPlace().getTypes();
+                        typeOfLocation="";
                         for(Type type : types){
-                            placeTypes.add(type.name());
+                            typeOfLocation += type.name();
+                            typeOfLocation +=",";
                         }
-                        Sender s =new Sender(MainActivity.this,urlAdrress,place,likelihood,placeTypes);
+                        Sender s =new Sender(MainActivity.this,urlAdrress,place,likelihood,typeOfLocation);
+                        typeOfLocation="";
                         s.execute();
-                        placeTypes.clear();
                     }
                 }
                 Log.d(TAG, String.format("type '%s'", response.toString()));
