@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String APP_KEY = "AIzaSyAIv8KvG6Sz5S87c2QTcMc_z-BYL7kX3C8";
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
     private static final float LIKELIHOOD_LIMIT_PERCENTAGE = 0.7f;
-    private static final int REFRESH_DATA_FREQUENCY_TIME = 1000; // 5minutes delay after each data transfer
+    private static final int REFRESH_DATA_FREQUENCY_TIME = 300000; // 5minutes delay after each data transfer
     private static List<PlaceLikelihood> placeLikelihoods;
     public PlacesClient placesClient;
 
