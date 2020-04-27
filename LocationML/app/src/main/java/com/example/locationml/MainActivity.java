@@ -37,20 +37,23 @@ public class MainActivity extends AppCompatActivity {
     private Runnable likelihoodsRunnable;
     private static final String APP_KEY = "AIzaSyAIv8KvG6Sz5S87c2QTcMc_z-BYL7kX3C8";
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
-    private static final float LIKELIHOOD_LIMIT_PERCENTAGE = 0.05f;
-    private static final int REFRESH_DATA_FREQUENCY_TIME = 300000; // 5minutes delay after each data transfer
+    private static final float LIKELIHOOD_LIMIT_PERCENTAGE = 0.7f;
+    private static final int REFRESH_DATA_FREQUENCY_TIME = 1000; // 5minutes delay after each data transfer
     private static List<PlaceLikelihood> placeLikelihoods;
     public PlacesClient placesClient;
 
     public String place;
     public String likelihood;
     public String typeOfLocation;
-    private static final String urlAdrress="https://serwer1990534.home.pl/PostLocation.php";
+    private static final String urlAddress="https://serwer1990534.home.pl/PostLocation.php";
+
+    private DataGenerator dataGenerator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dataGenerator = new DataGenerator();
         placesClient = InitPlaces();
         likelihoodsRunnable = CreateRunnableForLikelihood();
         RunGetPlacesTask(likelihoodsRunnable);
@@ -81,6 +84,15 @@ public class MainActivity extends AppCompatActivity {
         return FindCurrentPlaceRequest.newInstance(placeFields);
     }
 
+    void GetNearbyPlaces(float likelihoodLimit) {
+        FindCurrentPlaceRequest request = PreparePlacesRequest();
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            CreatePlacesTask(request);
+        } else {
+            RequestLocationPermission();
+        }
+    }
+
     void CreatePlacesTask(FindCurrentPlaceRequest request) {
         Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
         placeResponse.addOnCompleteListener(task -> {
@@ -88,17 +100,14 @@ public class MainActivity extends AppCompatActivity {
                 FindCurrentPlaceResponse response = task.getResult();
                 for (PlaceLikelihood placeLikelihood : placeLikelihoods = response.getPlaceLikelihoods()) {
                     if(placeLikelihood.getLikelihood() > LIKELIHOOD_LIMIT_PERCENTAGE) {
-                        place = placeLikelihood.getPlace().getName();
-                        likelihood = Double.toString(placeLikelihood.getLikelihood());
                         List<Type> types = placeLikelihood.getPlace().getTypes();
                         typeOfLocation="";
                         for(Type type : types){
                             typeOfLocation += type.name();
                             typeOfLocation +=",";
                         }
-                        Sender s =new Sender(MainActivity.this,urlAdrress,place,likelihood,typeOfLocation);
-                        typeOfLocation="";
-                        s.execute();
+                        place = placeLikelihood.getPlace().getName();
+                        dataGenerator.GenerateData(MainActivity.this,place,placeLikelihood.getLikelihood(),typeOfLocation,urlAddress);
                     }
                 }
                 Log.d(TAG, String.format("type '%s'", response.toString()));
@@ -111,15 +120,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    void GetNearbyPlaces(float likelihoodLimit) {
-        FindCurrentPlaceRequest request = PreparePlacesRequest();
-        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            CreatePlacesTask(request);
-        } else {
-            RequestLocationPermission();
-        }
     }
 
     public void RequestLocationPermission () {

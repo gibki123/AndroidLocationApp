@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.util.Date;
 import java.util.List;
 
 public class Sender extends AsyncTask<Void,Void,String>{
@@ -19,16 +20,20 @@ public class Sender extends AsyncTask<Void,Void,String>{
     Context c;
     String urlAddress;
     String place,likelihood, typeOfLocation;
+    Date date;
 
     ProgressDialog pd;
 
-    public Sender(Context c, String urlAddress, String place, String likelihood, String typeOfLocation) {
+    public Sender(Context c, String urlAddress, String place, String likelihood, String typeOfLocation, Date date ) {
         this.c = c;
         this.urlAddress = urlAddress;
         this.place=place;
         this.likelihood=likelihood;
         this.typeOfLocation=typeOfLocation;
+        this.date = date;
     }
+
+
 
     @Override
     protected void onPreExecute() {
