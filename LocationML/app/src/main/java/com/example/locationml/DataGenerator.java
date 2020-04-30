@@ -1,9 +1,12 @@
 package com.example.locationml;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.android.libraries.places.api.model.Place;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -19,10 +22,11 @@ public class DataGenerator {
     private static double MINUTE_IN_MILLISECONDS = 60000;
 
     public void GenerateData(Context context, String placeName, double likelihood, String types, String urlAddress) {
+        String likelihoodString = Double.toString(likelihood);
         if (likelihood > LIKELIHOOD_LIMIT_TO_STAY){
+            Log.d("Place", "Likelihood enough");
             Random generator = new Random();
             Boolean staying = true;
-            String likelihoodString = Double.toString(likelihood);
             double stayingProbability = PROBABILITY_TO_STAY_LONGER;
             double i = 0.0;
             while(staying) {
@@ -35,6 +39,9 @@ public class DataGenerator {
                     staying = false;
                 }
             }
+        } else {
+            Log.d("Place", "Likelihood not enough");
+            SendData(context,placeName,likelihoodString,types,urlAddress);
         }
     }
 
@@ -48,7 +55,8 @@ public class DataGenerator {
 
     private void SendData(Context context, String placeName, String likelihoodString, String types, String urlAddress) {
         CreateNewDate();
-        Sender s =new Sender(context,urlAddress,placeName,likelihoodString,types,fakeTimeOfGeneration);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        Sender s =new Sender(context,urlAddress,placeName,likelihoodString,types,dateFormat.format(fakeTimeOfGeneration));
         s.execute();
         IncrementTime();
     }

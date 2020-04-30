@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private Runnable likelihoodsRunnable;
     private static final String APP_KEY = "AIzaSyAIv8KvG6Sz5S87c2QTcMc_z-BYL7kX3C8";
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
-    private static final float LIKELIHOOD_LIMIT_PERCENTAGE = 0.7f;
+    private static final float LIKELIHOOD_LIMIT_PERCENTAGE = 0.05f;
     private static final int REFRESH_DATA_FREQUENCY_TIME = 300000; // 5minutes delay after each data transfer
     private static List<PlaceLikelihood> placeLikelihoods;
     public PlacesClient placesClient;
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             if (task.isSuccessful()){
                 FindCurrentPlaceResponse response = task.getResult();
                 for (PlaceLikelihood placeLikelihood : placeLikelihoods = response.getPlaceLikelihoods()) {
+                    Log.d(TAG, String.format("name %s, likelihood %s", placeLikelihood.getPlace().getName(), placeLikelihood.getLikelihood()));
                     if(placeLikelihood.getLikelihood() > LIKELIHOOD_LIMIT_PERCENTAGE) {
                         List<Type> types = placeLikelihood.getPlace().getTypes();
                         typeOfLocation="";
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                             typeOfLocation +=",";
                         }
                         place = placeLikelihood.getPlace().getName();
+                        Log.d(TAG, String.format("Before generating Data."));
                         dataGenerator.GenerateData(MainActivity.this,place,placeLikelihood.getLikelihood(),typeOfLocation,urlAddress);
                     }
                 }

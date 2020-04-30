@@ -3,6 +3,7 @@ package com.example.locationml;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -20,11 +21,11 @@ public class Sender extends AsyncTask<Void,Void,String>{
     Context c;
     String urlAddress;
     String place,likelihood, typeOfLocation;
-    Date date;
+    String date;
 
     ProgressDialog pd;
 
-    public Sender(Context c, String urlAddress, String place, String likelihood, String typeOfLocation, Date date ) {
+    public Sender(Context c, String urlAddress, String place, String likelihood, String typeOfLocation, String date ) {
         this.c = c;
         this.urlAddress = urlAddress;
         this.place=place;
@@ -43,6 +44,7 @@ public class Sender extends AsyncTask<Void,Void,String>{
         pd.setTitle("Send");
         pd.setMessage("Sending..Please wait");
         pd.show();
+        Log.d("Place","Pre sending place data.");
     }
 
     @Override
@@ -81,7 +83,7 @@ public class Sender extends AsyncTask<Void,Void,String>{
             OutputStream os=con.getOutputStream();
 
             BufferedWriter bw=new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
-            bw.write(new DataPackager(place,likelihood,typeOfLocation).packData());
+            bw.write(new DataPackager(place,likelihood,typeOfLocation,date).packData());
 
             bw.flush();
 
