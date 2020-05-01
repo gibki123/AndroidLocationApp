@@ -12,13 +12,13 @@ public class DataPackager {
     String place;
     String likelihood;
     String typeOfLocation;
-    String time;
+    String appTime;
 
-    public DataPackager(String place, String likelihood,String typeOfLocation, String time) {
+    public DataPackager(String place, String likelihood,String typeOfLocation, String appTime) {
         this.place = place;
         this.likelihood = likelihood;
         this.typeOfLocation = typeOfLocation;
-        this.time = time;
+        this.appTime = appTime;
     }
 
     public String packData()
@@ -30,7 +30,7 @@ public class DataPackager {
             jo.put("place",place);
             jo.put("likelihood",likelihood);
             jo.put("typeOfLocation",typeOfLocation);
-            jo.put("appTime",typeOfLocation);
+            jo.put("appTime",appTime);
             Boolean firstValue=true;
             Iterator it=jo.keys();
             do {
