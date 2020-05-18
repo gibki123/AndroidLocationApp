@@ -40,11 +40,11 @@ public class Sender extends AsyncTask<Void,Void,String>{
     protected void onPreExecute() {
         super.onPreExecute();
 
-        pd=new ProgressDialog(c);
-        pd.setTitle("Send");
-        pd.setMessage("Sending..Please wait");
-        pd.show();
-        Log.d("Place","Pre sending place data.");
+//        pd=new ProgressDialog(c);
+//        pd.setTitle("Send");
+//        pd.setMessage("Sending..Please wait");
+//        pd.show();
+          Log.d("Place","Pre sending place data.");
     }
 
     @Override
@@ -56,17 +56,17 @@ public class Sender extends AsyncTask<Void,Void,String>{
     protected void onPostExecute(String response) {
         super.onPostExecute(response);
 
-        pd.dismiss();
+       // pd.dismiss();
 
-        if(response != null)
-        {
-            //SUCCESS
-            Toast.makeText(c,response,Toast.LENGTH_LONG).show();
-        }else
-        {
-            //NO SUCCESS
-            Toast.makeText(c,"Unsuccessful "+response,Toast.LENGTH_LONG).show();
-        }
+//        if(response != null)
+//        {
+//            //SUCCESS
+//            Toast.makeText(c,response,Toast.LENGTH_LONG).show();
+//        }else
+//        {
+//            //NO SUCCESS
+//            Toast.makeText(c,"Unsuccessful "+response,Toast.LENGTH_LONG).show();
+//        }
     }
 
     private String send()
