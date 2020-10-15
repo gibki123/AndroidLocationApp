@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     public String likelihood;
     public String typeOfLocation;
     private static final String urlAddress="https://serwer1990534.home.pl/PostLocation.php";
-
     private DataGenerator dataGenerator;
 
     @Override
@@ -99,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
             if (task.isSuccessful()){
                 FindCurrentPlaceResponse response = task.getResult();
                 for (PlaceLikelihood placeLikelihood : placeLikelihoods = response.getPlaceLikelihoods()) {
-//                    Log.d(TAG, String.format("name %s, likelihood %s", placeLikelihood.getPlace().getName(), placeLikelihood.getLikelihood()));
                     if(placeLikelihood.getLikelihood() > LIKELIHOOD_LIMIT_PERCENTAGE) {
                         List<Type> types = placeLikelihood.getPlace().getTypes();
                         typeOfLocation="";
@@ -108,12 +106,10 @@ public class MainActivity extends AppCompatActivity {
                             typeOfLocation +=",";
                         }
                         place = placeLikelihood.getPlace().getName();
-//                        Log.d(TAG, String.format("Before generating Data."));
                         dataGenerator.GenerateData(MainActivity.this,place,placeLikelihood.getLikelihood(),typeOfLocation,urlAddress);
                     }
                 }
                 DataGenerator.IncrementTime();
-//                Log.d(TAG, String.format("type '%s'", response.toString()));
             }
             else {
                 Exception exception = task.getException();

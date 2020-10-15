@@ -26,7 +26,6 @@ public class DataGenerator {
     public void GenerateData(Context context, String placeName, double likelihood, String types, String urlAddress) {
         String likelihoodString = Double.toString(likelihood);
         if (likelihood > LIKELIHOOD_LIMIT_TO_STAY){
-//            Log.d("Place", "Likelihood enough");
             Random generator = new Random();
             Boolean staying = true;
             double stayingProbability = PROBABILITY_TO_STAY_LONGER;
@@ -43,7 +42,6 @@ public class DataGenerator {
                 }
             }
         } else {
-//            Log.d("Place", "Likelihood not enough");
             SendData(context,placeName,likelihoodString,types,urlAddress);
         }
     }
